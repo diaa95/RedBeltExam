@@ -9,13 +9,15 @@
         <p><a href="/success/{{this_user.id}}">Back</a>  <a href="/log_out">Log Out</a></p>
     </header>
     <h3>{{this_user.first_name}} {{this_user.last_name}}'s Quotes</h3>
-    <ul>
-    {% for quote in all_quotes %}
-    <li>{{quote.author}}</li>
+    <div style="border: 2px solid black; width:fit-content">
         <ul>
-            <li>{{quote.quote}}</li>
+        {% for quote in all_quotes %}
+        <li>{{quote.author}}</li>
+            <ul>
+                <li>{{quote.quote}}</li>
+            </ul>
+        {% endfor %}
         </ul>
-    {% endfor %}
-    </ul>
+    </div>
 </body>
 </html>

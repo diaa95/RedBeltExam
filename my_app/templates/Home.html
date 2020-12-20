@@ -31,25 +31,27 @@
         </div>
         <div>
         {% if all_quotes %}
-            <ul class="book">
-                {% for quote in all_quotes %}
-                    <li>
-                        <p>{{ quote.author }}: "{{quote.quote}}" </p>
-                        <a href="/user_page/{{quote.uploaded_by.id}}">Posted by {{quote.uploaded_by.first_name}} {{quote.uploaded_by.last_name}}</a>
-                        {% if quote in this_user.liked_quotes.all %}
-                        <p>{{ quote.users_who_like.all|length }} people likes this</p>
-                        <a href="/UnFavorite/{{quote.id}}/{{this_user.id}}">Unlike</a>
-                        {% endif %}
-                        {% if quote not in this_user.liked_quotes.all %}
-                        <p>{{ quote.users_who_like.all|length }} people likes this</p>
-                        <a href="/add_fav/{{quote.id}}/{{this_user.id}}">Like</a>
-                        {% endif %}
-                        {% if quote.uploaded_by.id == this_user.id %}
-                        <a href="/quotes/{{quote.id}}/{{this_user.id}}/destroy"><button type="button">Delete</button></a>
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
+                <ul class="book">
+                    {% for quote in all_quotes %}
+                    <div style="border: 2px solid black; width:fit-content; margin-bottom: 20px">
+                        <li>
+                            <p>{{ quote.author }}: "{{quote.quote}}" </p>
+                            <a href="/user_page/{{quote.uploaded_by.id}}">Posted by {{quote.uploaded_by.first_name}} {{quote.uploaded_by.last_name}}</a>
+                            {% if quote in this_user.liked_quotes.all %}
+                            <p>{{ quote.users_who_like.all|length }} people likes this</p>
+                            <a href="/UnFavorite/{{quote.id}}/{{this_user.id}}">Unlike</a>
+                            {% endif %}
+                            {% if quote not in this_user.liked_quotes.all %}
+                            <p>{{ quote.users_who_like.all|length }} people likes this</p>
+                            <a href="/add_fav/{{quote.id}}/{{this_user.id}}">Like</a>
+                            {% endif %}
+                            {% if quote.uploaded_by.id == this_user.id %}
+                            <a href="/quotes/{{quote.id}}/{{this_user.id}}/destroy"><button type="button">Delete</button></a>
+                            {% endif %}
+                        </li>
+                    </div>
+                    {% endfor %}
+                </ul>
         {% endif %}
         </div>
     </main>
