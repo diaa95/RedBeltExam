@@ -97,7 +97,7 @@ def log_in(log_in_data):
 def success(user_id):
     context = {
         'this_user': User.objects.get(id=user_id),
-        'all_books': Book.objects.all()
+        'all_quotes': Quote.objects.all()
     }
     return context
 
