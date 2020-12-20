@@ -44,11 +44,25 @@ class UserManager(models.Manager):
 
     def add_quote_validator(self, postData):
         errors = {}
-        if len(postData['title']) == 0:
-            errors['title'] = "title is required"
-        if len(postData['desc']) < 5:
-            errors['desc'] = "Description should be at least five characters"
+        if len(postData['author']) < 3:
+            errors['author'] = "Author should be at least three characters"
+        if len(postData['quote']) < 10:
+            errors['quote'] = "Quote should be at least ten characters"
         return errors
+
+
+    def update_info_validator(self, postData):
+        errors = {}
+        # add keys and values to errors dictionary for each invalid field
+        EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9.+_-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]+$')
+        if not EMAIL_REGEX.match(postData['email']):
+            errors['email'] = "Invalid email address!"
+        if len(postData['first_name']) < 2:
+            errors["first_name"] = "first_name should be at least 2 characters"
+        if len(postData['last_name']) < 2:
+            errors["last_name"] = "last_name should be at least 2 characters"
+        return errors
+
 
 
 class User(models.Model):
@@ -65,8 +79,8 @@ class User(models.Model):
 class Quote(models.Model):
     author = models.CharField(max_length=255)
     quote = models.TextField(null=True)
-    uploaded_by = models.ForeignKey(User, related_name="book_uploaded", on_delete=models.CASCADE)
-    users_who_like = models.ManyToManyField(User, related_name="liked_books")
+    uploaded_by = models.ForeignKey(User, related_name="quote_uploaded", on_delete=models.CASCADE)
+    users_who_like = models.ManyToManyField(User, related_name="liked_quotes")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     objects = UserManager()
@@ -97,7 +111,7 @@ def log_in(log_in_data):
 def success(user_id):
     context = {
         'this_user': User.objects.get(id=user_id),
-        'all_quotes': Quote.objects.all()
+        'all_quotes': Quote.objects.all(),
     }
     return context
 
@@ -118,6 +132,10 @@ def get_quote(book_id):
     return Quote.objects.get(id=book_id)
 
 
+def get_users_quotes(user_id):
+    return Quote.objects.all().filter(uploaded_by=get_user(user_id))
+
+
 def display(book_id, user_id):
     context = {
         'book': Quote.objects.get(id=book_id),
@@ -126,35 +144,36 @@ def display(book_id, user_id):
     return context
 
 
-def add_fav(book_id, user_id):
-    this_book = Book.objects.get(id=book_id)
+def add_fav(quote_id, user_id):
+    this_quote = Quote.objects.get(id=quote_id)
     this_user = User.objects.get(id=user_id)
-    this_user.liked_books.add(this_book)
+    this_user.liked_quotes.add(this_quote)
     return
 
 
-def unfavorite(book_id, user_id):
-    this_book = Book.objects.get(id=book_id)
+def unfavorite(quote_id, user_id):
+    this_quote = Quote.objects.get(id=quote_id)
     this_user = User.objects.get(id=user_id)
-    this_user.liked_books.remove(this_book)
+    this_user.liked_quotes.remove(this_quote)
 
 
 def add_quote(user_id, quote_info):
-    added_quote = Quote.objects.create(title=quote_info['title'], desc=quote_info['desc'], uploaded_by=User.objects.get(id=user_id))
+    added_quote = Quote.objects.create(author=quote_info['author'], quote=quote_info['quote'], uploaded_by=User.objects.get(id=user_id))
     # this_user = get_user(user_id)
     # this_user.liked_books.add(added_quote)
     return added_quote.id
 
 
-def update(postData, book_id):
-    this_book = get_book(book_id)
-    this_book.title = postData['title']
-    this_book.desc = postData['desc']
-    this_book.save()
+def update(postData, user_id):
+    this_user = get_user(user_id)
+    this_user.first_name = postData['first_name']
+    this_user.last_name = postData['last_name']
+    this_user.email = postData['email']
+    this_user.save()
     return
 
 
-def destroy(book_id):
-    this_book = get_book(book_id)
+def destroy(quote_id):
+    this_book = get_quote(quote_id)
     this_book.delete()
     return

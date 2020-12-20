@@ -30,7 +30,6 @@ def log_in(request):
         context = models.log_in(request.POST)
         if context['flag']:
             request.session['logged_id'] = context['this_user'].id
-            messages.success(request, "You Registered/Logged in Successfully")
             return redirect(f"success/{context['this_user'].id}")
         else:
             messages.error(request, "you need to register")
@@ -52,7 +51,8 @@ def success(request, user_id):
 
 def user_page(request, user_id):
     context = {
-        'this_user': models.get_user(user_id)
+        'this_user': models.get_user(user_id),
+        'all_quotes': models.get_users_quotes(user_id)
     }
     return render(request, "YourProfile.html", context)
 
@@ -68,48 +68,37 @@ def add_quote(request, user_id):
         return redirect(f'/success/{user_id}')
 
 
-# def book_details(request, user_id, book_id):
-#     if int(book_id) in models.uploaded(user_id):
-#         return redirect(f"/edit/{book_id}/{user_id}")
-#     else:
-#         return redirect(f"/display/{book_id}/{user_id}")
+def add_fav(request, quote_id, user_id):
+    models.add_fav(quote_id, user_id)
+    return redirect(f'/success/{user_id}')
+
+
+def unfavorite(request, quote_id, user_id):
+    models.unfavorite(quote_id, user_id)
+    return redirect(f'/success/{user_id}')
+
+
+def destroy(request, quote_id, user_id):
+    models.destroy(quote_id)
+    return redirect(f'/success/{user_id}')
+
+
+def edit(request, user_id):
+    context = {
+        "this_user": models.get_user(user_id)
+    }
+    return render(request, 'edit.html', context)
+
+
+def update(request, user_id):
+    errors = models.User.objects.update_info_validator(request.POST)
+    if len(errors) > 0:
+        for key, value in errors.items():
+            messages.error(request, value)
+        return redirect(f"/edit/{user_id}")
+    else:
+        models.update(request.POST, user_id)
+        return redirect(f'/success/{user_id}')
+
 #
-#
-# def edit(request, book_id, user_id):
-#     context = {
-#         'this_book': models.get_book(book_id),
-#         "this_user": models.get_user(user_id)
-#     }
-#     return render(request, 'edit.html', context)
-#
-#
-# def update(request, book_id, user_id):
-#     errors = models.Book.objects.add_book_validator(request.POST)
-#     if len(errors) > 0:
-#         for key, value in errors.items():
-#             messages.error(request, value)
-#         return redirect(f"/success/{user_id}")
-#     else:
-#         models.update(request.POST, book_id)
-#         return redirect(f'/success/{user_id}')
-#
-#
-# def destroy(request, book_id, user_id):
-#     models.destroy(book_id)
-#     return redirect(f'/success/{user_id}')
-#
-#
-#
-# def display(request, book_id, user_id):
-#     context = models.display(book_id, user_id)
-#     return render(request, "display.html", context)
-#
-#
-# def add_fav(request, book_id, user_id):
-#     models.add_fav(book_id, user_id)
-#     return redirect(f'/success/{user_id}')
-#
-#
-# def unfavorite(request, book_id, user_id):
-#     models.unfavorite(book_id, user_id)
-#     return redirect(f'/success/{user_id}')
+

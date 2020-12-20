@@ -5,10 +5,16 @@
     <title>Your Favorites</title>
 </head>
 <body>
-    <h3>Books You Like:</h3>
+    <header style="display: flex; justify-content: flex-end; border-bottom:1p solid black;">
+        <p><a href="/success/{{this_user.id}}">Back</a>  <a href="/log_out">Log Out</a></p>
+    </header>
+    <h3>{{this_user.first_name}} {{this_user.last_name}}'s Quotes</h3>
     <ul>
-    {% for book in this_user.liked_books.all %}
-    <li>{{book.title}} <a href="/UnFavorite/{{book.id}}/{{this_user.id}}">UnFavorite</a></li>
+    {% for quote in all_quotes %}
+    <li>{{quote.author}}</li>
+        <ul>
+            <li>{{quote.quote}}</li>
+        </ul>
     {% endfor %}
     </ul>
 </body>
